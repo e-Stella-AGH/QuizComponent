@@ -1,26 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import QuizComponent from './components/Quiz';
+import QuizForm from './components/QuizForm/QuizForm';
+import { api } from './services/QuizService'
+import { useState, useEffect } from 'react'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+  const [quizes, setQuizes] = useState<Array<object>>([])
+  const [isAdding, setIsAdding] = useState<null | boolean>(null)
+
+  useEffect(() => {
+    const result = [api.getQuiz()];
+    setQuizes(result)
+  }, [])
+
+  const saveForm = (value: Object) => {
+    const copyQuizes = [...quizes]
+    copyQuizes.push(value)
+    setQuizes(copyQuizes)
+    setIsAdding(null)
+  }
+
+
+  if (isAdding === null) {
+    return (
+      <div>
+        <button onClick={() => setIsAdding(true)}>Add Quiz</button>
+        <button onClick={() => setIsAdding(false)}>Start Quiz</button>
+      </div>
+    )
+  } else if (isAdding == true)
+    return (<QuizForm onSubmit={saveForm} />)
+  else 
+    return (<QuizComponent exit={() => setIsAdding(null)} quiz={quizes[quizes.length-1]} />)
 }
 
 export default App;
